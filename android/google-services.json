@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "5417443819",
+    "firebase_url": "https://tinderpet-62bb9.firebaseio.com",
+    "project_id": "tinderpet-62bb9",
+    "storage_bucket": "tinderpet-62bb9.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:5417443819:android:18b5a16fa61be974a5b9ae",
+        "android_client_info": {
+          "package_name": "com.tinderpet"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "5417443819-n1knt06e0qvb6mqb24en0n576mrsun3k.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.tinderpet",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "5417443819-0kc0j706gaqpgconce41mrqjvoc1n6k2.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC6Nyt7Obvh0QRdIiqX_4UYYkdPu2SMxvE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "5417443819-0kc0j706gaqpgconce41mrqjvoc1n6k2.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
