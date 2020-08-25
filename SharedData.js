@@ -2,8 +2,10 @@ export const SharedData ={
     description: "A list of dog breeds.",
     dogs:
       [
-        "Affenpinscher",
+        // "Affenpinscher",
         "Afghan Hound",
+        "German Shaphard",
+        "labrador",
         "Aidi",
         "Airedale Terrier",
         "Akbash Dog",
@@ -183,7 +185,7 @@ export const SharedData ={
         "Gascon Saintongeois",
         "German Longhaired Pointer",
         "German Pinscher",
-        "German Shepherd",
+       
         "German Shorthaired Pointer",
         "German Spaniel",
         "German Spitz",
@@ -455,5 +457,15 @@ export const SharedData ={
         "Wirehaired Vizsla",
         "Yorkshire Terrier",
         "Šarplaninac"
-      ]
+      ],
+      cats:[
+        "Abyssinian",
+        "Aegean",
+        "American Curl",
+        "American Bobtail",
+        "American Shorthair",
+        "American Wirehair",
+        "Arabian Mau",
+        "Australian Mist",
+        "Asian",]
   }

@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import {createBottomTabNavigator} from '@react-navigation/bottom-tabs';
 
 import {ProfileStack} from './ProfileStack';
-import {Mape, Explorer, Favorites, Chat, Profile, Petprofile, GetpetData} from '../screens';
+import {Mape, Explorer, Favorites, Chat, Profile, Petprofile, GetpetData, UserData, Petprofile1} from '../screens';
 import {createStackNavigator} from '@react-navigation/stack';
 
 
@@ -25,6 +25,9 @@ export const AppTabs = () => {
       <Tabs.Screen name="Petprofile" component={Petprofile} />
       <Tabs.Screen name="getPetprofile" component={Petprofile} />
       <Tabs.Screen name="Addpet" component={GetpetData} />
+      <Tabs.Screen   options={{headerShown: false}} name="EditProfile" component={UserData} />
+      <Tabs.Screen name="Petprofile1" component={Petprofile1} />
+
     </Tabs.Navigator>
   );
 };

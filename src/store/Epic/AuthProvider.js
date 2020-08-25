@@ -24,4 +24,9 @@ export const AuthProvider = {
       }
     });
   },
+  getUserData: (dispatch, ownprops)=>{
+
+    dispatch({type: 'ADDITIONAL_DATA', payload: {ownprops,isSigned:true}});
+
+  }
 };

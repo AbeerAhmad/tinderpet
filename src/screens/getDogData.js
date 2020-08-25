@@ -12,6 +12,7 @@ import {
   Input,
   Picker,
   Toast,
+  Spinner,
 } from 'native-base';
 import storage from '@react-native-firebase/storage';
 import database from '@react-native-firebase/database';
@@ -28,23 +29,22 @@ import Autocomplete from 'react-native-autocomplete-input';
 import {TouchableHighlight, ScrollView} from 'react-native-gesture-handler';
 var ImagePicker = NativeModules.ImageCropPicker;
 import {SharedData} from '../../SharedData';
-import { connect } from 'react-redux';
+import {connect} from 'react-redux';
+import {PetProvider} from '../store/Epic';
 class PetData extends Component {
-state={
-  image:'',
-  images:'',
-  specie:'Dog',
-  petname:'',
-  gender:'Male',
-  dob:'',
-  breed:'',
-  petProfile:'',
+  state = {
+    image: '',
+    images: '',
+    specie: 'Dog',
+    petname: '',
+    gender: 'Male',
+    dob: '',
+    breed: '',
+    petProfile: '',
+    spinner: false,
+  };
 
-}
-
-  
-  
-   pickSingleWithCamera = (cropping, mediaType = 'photo') => {
+  pickSingleWithCamera = (cropping, mediaType = 'photo') => {
     ImagePicker.openCamera({
       cropping: cropping,
       width: 500,
@@ -61,12 +61,11 @@ state={
           height: image.height,
           mime: image.mime,
         };
-       
-this.setState({
-  image:file,
-  images:null
-})
 
+        this.setState({
+          image: file,
+          images: null,
+        });
       })
       .catch(e => alert(e));
   };
@@ -87,9 +86,9 @@ this.setState({
           height: image.height,
         };
         this.setState({
-          image:file,
-          images:null
-        })
+          image: file,
+          images: null,
+        });
       })
       .catch(e => alert(e));
   };
@@ -104,7 +103,8 @@ this.setState({
       });
   };
 
- pickSingle = (cropit, circular = false, mediaType) => {
+  pickSingle = (cropit, circular = false, mediaType) => {
+    this.setState({spinner: true});
     ImagePicker.openPicker({
       width: 500,
       height: 500,
@@ -133,6 +133,7 @@ this.setState({
           },
           function(error) {
             // Handle unsuccessful uploads
+            this.setState({spinner: false});
           },
           async () => {
             // Handle successful uploads on complete
@@ -142,9 +143,10 @@ this.setState({
               .getDownloadURL();
             // setpetProfile(url);
             this.setState({
-              petProfile:url
-            })
+              petProfile: url,
+            });
             console.log('success');
+            this.setState({spinner: false});
           },
         );
         let file = {
@@ -154,17 +156,19 @@ this.setState({
           mime: image.mime,
         };
         this.setState({
-          image:file,
-          images:null
-        })
+          image: file,
+          images: null,
+        });
       })
       .catch(e => {
         console.log(e);
+        this.setState({spinner: false});
+
         Alert.alert(e.message ? e.message : e);
       });
   };
 
- renderImage = image => {
+  renderImage = image => {
     return (
       <Image
         style={{width: 120, height: 120, resizeMode: 'contain'}}
@@ -179,16 +183,16 @@ this.setState({
 
     return this.renderImage(image);
   };
- createPet = () => {
-   const {petProfile,gender,breed,dob,petname,specie}=this.state
+  createPet = () => {
+    const {petProfile, gender, breed, dob, petname, specie} = this.state;
     if (petProfile && gender && breed && dob && petname && specie != null) {
-     console.log(this.props.user.uid  )
-     const uid =this.props.user.uid
+      console.log(this.props.user.uid);
+      const uid = this.props.user.uid;
       var newPostKey = database()
         .ref()
         .child('posts')
         .push().key;
-
+      this.props.addNewPet(newPostKey);
       database()
         .ref('/pets/' + newPostKey)
         .set(
@@ -200,9 +204,9 @@ this.setState({
             specie: specie,
             petname: petname,
             ownerid: uid,
-            id:newPostKey
+            id: newPostKey,
           },
-          function(error) {
+          error => {
             if (error) {
               // The write failed...
               console.log(error);
@@ -226,6 +230,7 @@ this.setState({
                 duration: 2000,
                 position: 'bottom',
               });
+              this.props.navigation.navigate('profile');
             }
           },
         );
@@ -239,103 +244,128 @@ this.setState({
       });
     }
   };
-render(){
-  const {petProfile,gender,breed,dob,petname,specie}=this.state
-  return (
-    <View>
-      <ScrollView>
-        <View>
-          <View style={{alignSelf: 'center', marginTop: 30, marginBottom: 30}}>
-            <TouchableOpacity onPress={() => this.pickSingle(true)}>
-              <View style={style.ThumbnailContainer}>
-                {this.state.image ? (
-                  this.renderAsset(this.state.image)
-                ) : (
-                  <Image
-                    style={{height: 100, width: 100}}
-                    source={require('../assets/dog.png')}
-                  />
-                )}
-                <View style={style.editicon}>
-                  <Icon type="MaterialIcons" name="edit" />
+  render() {
+    const {petProfile, gender, breed, dob, petname, specie} = this.state;
+    return (
+      <View>
+        <ScrollView>
+          <View>
+            <View
+              style={{alignSelf: 'center', marginTop: 30, marginBottom: 30}}>
+              <TouchableOpacity onPress={() => this.pickSingle(true)}>
+                <View style={style.ThumbnailContainer}>
+                  {this.state.spinner ? (
+                    <Spinner />
+                  ) : this.state.image ? (
+                    this.renderAsset(this.state.image)
+                  ) : (
+                    <Image
+                      style={{height: 100, width: 100}}
+                      source={require('../assets/dog.png')}
+                    />
+                  )}
+                  <View style={style.editicon}>
+                    <Icon type="MaterialIcons" name="edit" />
+                  </View>
+                  <Image />
                 </View>
-                <Image />
-              </View>
-            </TouchableOpacity>
+              </TouchableOpacity>
+            </View>
+            <View style={{padding: 5}}>
+              <Item picker>
+                <Picker
+                  mode="dropdown"
+                  iosIcon={<Icon name="arrow-down" />}
+                  style={{width: undefined}}
+                  placeholder="Select your SIM"
+                  placeholderStyle={{color: '#bfc6ea'}}
+                  placeholderIconColor="#007aff"
+                  selectedValue={specie}
+                  onValueChange={value => this.setState({specie: value})}>
+                  <Picker.Item label="Dog" value="Dog" />
+                  <Picker.Item label="Cat" value="Cat" />
+                </Picker>
+              </Item>
+              <Item floatingLabel style={{padding: 5, margin: 5}}>
+                <Label>Petname</Label>
+                <Input
+                  value={petname}
+                  onChangeText={value => this.setState({petname: value})}
+                />
+              </Item>
+              <Item floatingLabel style={{padding: 5}}>
+                <Label>Age</Label>
+                <Input
+                  value={dob}
+                  onChangeText={value => this.setState({dob: value})}
+                />
+              </Item>
+              <Item picker style={{padding: 5}}>
+                <Picker
+                  mode="dropdown"
+                  iosIcon={<Icon name="arrow-down" />}
+                  style={{width: undefined}}
+                  placeholder="Sex"
+                  placeholderStyle={{color: '#bfc6ea'}}
+                  placeholderIconColor="#007aff"
+                  selectedValue={gender}
+                  onValueChange={value => this.setState({gender: value})}>
+                  <Picker.Item label="Male" value="male" />
+                  <Picker.Item label="Female" value="Female" />
+                </Picker>
+              </Item>
+              <Item picker style={{padding: 5}}>
+                <Picker
+                  mode="dialog"
+                  iosIcon={<Icon name="arrow-down" />}
+                  style={{width: undefined}}
+                  placeholder="breed"
+                  placeholderStyle={{color: '#bfc6ea'}}
+                  placeholderIconColor="#007aff"
+                  selectedValue={breed}
+                  onValueChange={value => this.setState({breed: value})}>
+                  {(this.state.specie == 'Dog'
+                    ? SharedData.dogs
+                    : SharedData.cats
+                  ).map((item, i) => {
+                    return <Picker.Item label={item} key={i} value={item} />;
+                  })}
+                </Picker>
+              </Item>
+            </View>
+            <Button
+              style={{margin: 40, backgroundColor: '#00B5C3'}}
+              block
+              onPress={() => this.createPet()}>
+              <Text style={{justifyContent: 'center'}}>Add</Text>
+            </Button>
+            {/* <Button style={{margin:40,backgroundColor:'#00B5C3'}} block onPress={() => this.props.navigation.navigate('profile')}>
+            <Text style={{justifyContent:'center'}}>Add</Text>
+          </Button> */}
           </View>
-          <View style={{padding: 5}}>
-            <Item picker>
-              <Picker
-                mode="dropdown"
-                iosIcon={<Icon name="arrow-down" />}
-                style={{width: undefined}}
-                placeholder="Select your SIM"
-                placeholderStyle={{color: '#bfc6ea'}}
-                placeholderIconColor="#007aff"
-                selectedValue={specie}
-                onValueChange={value =>this.setState({specie:value})}>
-                <Picker.Item label="Dog" value="Dog" />
-                <Picker.Item label="Cat" value="Cat" />
-              </Picker>
-            </Item>
-            <Item floatingLabel style={{padding: 5, margin: 5}}>
-              <Label>Petname</Label>
-              <Input
-                value={petname}
-                onChangeText={value => this.setState({petname:value})}
-              />
-            </Item>
-            <Item floatingLabel style={{padding: 5}}>
-              <Label>Date of Birth</Label>
-              <Input value={dob} onChangeText={value => this.setState({dob:value})} />
-            </Item>
-            <Item picker style={{padding: 5}}>
-              <Picker
-                mode="dropdown"
-                iosIcon={<Icon name="arrow-down" />}
-                style={{width: undefined}}
-                placeholder="Sex"
-                placeholderStyle={{color: '#bfc6ea'}}
-                placeholderIconColor="#007aff"
-                selectedValue={gender}
-                onValueChange={value => this.setState({gender:value})}>
-                <Picker.Item label="Male" value="male" />
-                <Picker.Item label="Female" value="Female" />
-              </Picker>
-            </Item>
-            <Item picker style={{padding: 5}}>
-              <Picker
-                mode="dialog"
-                iosIcon={<Icon name="arrow-down" />}
-                style={{width: undefined}}
-                placeholder="breed"
-                placeholderStyle={{color: '#bfc6ea'}}
-                placeholderIconColor="#007aff"
-                selectedValue={breed}
-                onValueChange={value => this.setState({breed:value})}>
-                {SharedData.dogs.map((item, i) => {
-                  return <Picker.Item label={item} key={i} value={item} />;
-                })}
-              </Picker>
-            </Item>
-          </View>
-          <Button onPress={() => this.createPet()}>
-            <Text>Add</Text>
-          </Button>
-        </View>
-      </ScrollView>
-    </View>
-  );
-}
+        </ScrollView>
+      </View>
+    );
+  }
 }
 
 const mapStateToProps = store => {
   return {
     user: store.authReducer.user,
-    userPetDetails:store.petreducer.userPetDetails
+    userPetDetails: store.petreducer.userPetDetails,
   };
 };
-export const GetpetData= connect(mapStateToProps)(PetData)
+const mapDispatchToprops = dispatch => {
+  return {
+    addNewPet: data => {
+      PetProvider.addNewPet(dispatch, data);
+    },
+  };
+};
+export const GetpetData = connect(
+  mapStateToProps,
+  mapDispatchToprops,
+)(PetData);
 
 const size = 120;
 const style = StyleSheet.create({

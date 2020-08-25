@@ -9,3 +9,5 @@ export * from './getDogData';
 export * from './Explore'
 export * from './Favorites'
 export * from './Chat'
+export * from './userData'
+export * from './PetProfilecopy'

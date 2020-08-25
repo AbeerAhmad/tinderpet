@@ -9,26 +9,46 @@ import {
   ImageBackground,
   FlatList
 } from 'react-native';
+import database from '@react-native-firebase/database';
 import CardItem from '../components/CardItem';
 import Icon from '../components/Icon';
 import Demo from '../assets/data/demo.js';
 import { connect } from 'react-redux';
 
 class Favoritesclass extends Component {
+state={
+  userFavourites:{}
+}
+    componentDidMount(){
+      
+        console.log(this.props.userFavourites)
+        const {userFavourites}=this.props
+        if(userFavourites){
+          userFavourites.map((item,i)=>{
+            database()
+            .ref('pets/'+item)
+            .on('value', snapshot => {
+            console.log(snapshot.val())
+            let data=snapshot.val()
+            let newfav=this.state.userFavourites
+            newfav[item]=data
+            this.setState({
+              userFavourites:newfav
+            })
+            })
+          })
+
+        }
+      }
   render(){
-    const {userFavourites}=this.props
-    console.log(userFavourites)
+    const {userFavourites}=this.state
   return (
     <ImageBackground
       source={require('../assets/images/bg.png')}
       style={styles.bg}
     >
       <View style={styles.containerMatches}>
-        <ScrollView>
-          <View style={styles.top}>
-            <Text style={styles.title}>Matches</Text>
-          
-          </View>
+        
 
           <FlatList
             numColumns={2}
@@ -38,21 +58,22 @@ class Favoritesclass extends Component {
               <TouchableOpacity>
                 <CardItem
                   image={userFavourites[item].petProfile}
-                  name={item.name}
-                  status={item.status}
+                  name={userFavourites[item].petname}
+                  petid={item}
+                  ownerid={userFavourites[item].ownerid}
                   variant
                 />
               </TouchableOpacity>
             )}
           />
-        </ScrollView>
+       
       </View>
     </ImageBackground>
   );}
 };
 const mapStateToProps=(store)=>{
   return{
-    userFavourites:store.petreducer.userFavourites,
+    userFavourites:store.authReducer.user.favourites,
 loading:store.petreducer.loading
 }
 }

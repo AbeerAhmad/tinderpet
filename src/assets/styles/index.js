@@ -36,7 +36,7 @@ export default StyleSheet.create({
     backgroundColor: PRIMARY_COLOR,
     paddingVertical: 7,
     paddingHorizontal: 20,
-    borderRadius: 20,
+    borderRadius: 30,
   },
   matchesTextCardItem: {
     fontFamily: ICON_FONT,
@@ -406,7 +406,7 @@ export default StyleSheet.create({
     color: BLACK,
   },
   containerCardItem: {
-    backgroundColor: WHITE,
+    backgroundColor: 'white',
     borderRadius: 8,
     alignItems: 'center',
     margin: 10,
@@ -421,7 +421,6 @@ export default StyleSheet.create({
   img: {
     width: 120,
     height: 120,
-    marginTop: 40,
     borderRadius: 120 / 2,
   },
   center: {
@@ -429,9 +428,10 @@ export default StyleSheet.create({
     alignItems: 'center',
   },
   petContainer: {
-    display: 'flex',
-    flexDirection: 'row',
-    margin: 10,
+    justifyContent: 'space-between',
+    flexDirection:'row',
+    paddingHorizontal: 10,
+    
   },
   petAvatar: {
     width: petAvatarSize,
@@ -440,6 +440,8 @@ export default StyleSheet.create({
   },
   petcard: {
     flex: 1,
+  // alignSelf:'flex-end',
+  width:120
     // justifyContent: 'center',
     // alignItems: 'center',
   },

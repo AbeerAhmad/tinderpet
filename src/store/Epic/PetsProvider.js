@@ -4,24 +4,34 @@ import database from '@react-native-firebase/database';
 import store from '../index';
 import {object} from 'prop-types';
 
+
+
+
+
 export const PetProvider = {
   allpets: dispatch => {
     //  console.log(getState)
-// dispatch({type:'MAKE_LOADING_TRUE',payload:true})
+    // dispatch({type:'MAKE_LOADING_TRUE',payload:true})
+    console.log('getting pets')
     database()
       .ref('pets')
       .on('value', snapshot => {
+        console.log(snapshot,'snapshot')
         let data = (snapshot.val() && snapshot.val()) || {};
         const state = store.getState();
         let userpetdetails = {};
-let userFavourites={}
+        let userFavourites = {};
         let signin = state.authReducer.isSigned;
+        console.log(signin,'Checking if the user is sign in or there is a glitch')
         if (signin) {
           let userpets =
             (state.authReducer.user.pets && state.authReducer.user.pets) || [];
           console.log(userpets);
+          console.log('run again');
           let favourites =
-          (state.authReducer.user.favourites && state.authReducer.user.favourites) || [];
+            (state.authReducer.user.favourites &&
+              state.authReducer.user.favourites) ||
+            [];
           Object.keys(data).map((item, i) => {
             let flag = userpets.indexOf(item);
             if (flag !== -1) {
@@ -55,29 +65,38 @@ let userFavourites={}
               }
             });
           });
-console.log(pettoexplore)
+    
           dispatch({
-            type: 'GET_ALL_PETS', 
-            payload: {userPetDetails: userpetdetails, pettoexplore: pettoexplore,userFavourites:userFavourites},
+            type: 'GET_ALL_PETS',
+            payload: {
+              userPetDetails: userpetdetails,
+              pettoexplore: pettoexplore,
+              userFavourites: userFavourites,
+            },
           });
         }
       });
   },
-  addPetToFavourite: (dispatch,ownprops) => {
+  addPetToFavourite: (dispatch, ownprops) => {
+    const newstore = store.getState();
+    const petstoexplore = newstore.petreducer.pettoexplore;
+    let uid = newstore.authReducer.user.uid;
+    console.log(petstoexplore);
+    let favourtepet = Object.keys(petstoexplore)[ownprops];
+    console.log(favourtepet);
+    var updateuser = firestore()
+      .collection('users')
+      .doc(uid);
+    updateuser.update({
+      favourites: firestore.FieldValue.arrayUnion(favourtepet),
+    });
+    delete petstoexplore[favourtepet];
+    console.log()
+    dispatch({type: 'CHANGE_IN_PETSTOEXPLORE', payload: petstoexplore});
+    dispatch({type: 'ADD_PET_TO_USER_FAVOURITE', payload: favourtepet});
 
-   const newstore=store.getState();
-  const petstoexplore=newstore.petreducer.pettoexplore
-  let uid=newstore.authReducer.user.uid
- console.log(petstoexplore)
-let favourtepet=Object.keys(petstoexplore)[ownprops]
-console.log(favourtepet)
-  var updateuser = firestore()
-  .collection('users')
-  .doc(uid);
-updateuser.update({
-  favourites: firestore.FieldValue.arrayUnion(favourtepet),
-});
- delete petstoexplore[favourtepet]
- dispatch({type:'CHANGE_IN_PETSTOEXPLORE',payload:petstoexplore})
   },
+  addNewPet:(dispatch,ownProps)=>{
+dispatch({type:'ADD_PET_IN_USER_ARRAY',payload:ownProps})
+  }
 };

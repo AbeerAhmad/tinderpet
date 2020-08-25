@@ -16,7 +16,8 @@ const Icon = ({ name }) => {
     optionsH: '&#xf141;',
     chat: '&#xf4ac;',
     explore: '&#xf50d;',
-    cog:'&#xe800'
+    cog:'&#xe800',
+    empty:'&#xf51d',
   };
 
   let icon = iconsList[name];
